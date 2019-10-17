@@ -1,9 +1,24 @@
 #include <iostream>
+#include <Menu.h>
 
 using namespace std;
 
-int main(int argc, char *argv[])
+void clear(){
+    system("clear");
+}
+
+void pause(){
+
+}
+
+
+int main()
 {
-    cout << "Hello World!" << endl;
+    srand(time(NULL));
+    Menu m;
+    m.run();
+
+
+
     return 0;
 }
