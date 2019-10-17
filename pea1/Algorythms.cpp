@@ -99,6 +99,21 @@ std::vector<int> Algorythms::greedyTSP(int beginVert, const NeighbourMatrix &m, 
     return path;
 }
 
+std::vector<int> Algorythms::dinamicTSP(int beginVert, const NeighbourMatrix &m, int &distance)
+{
+    std::vector<int> s;
+    for(int i=0;i<m.size();++i)
+        s.push_back(i);
+
+    std::vector<int> path;
+    distance = dynamicTSPDistanceF(beginVert, s, beginVert, m, path);
+
+    path.insert(path.begin(), beginVert);
+    path.push_back(beginVert);
+
+    return path;
+}
+
 
 Algorythms::BruteforceData Algorythms::bruteforceRecursive(int current, std::vector<int> path, int distance, const NeighbourMatrix &m, std::vector<int>&currentMinPath, int& currentMinDistance)
 {
@@ -176,5 +191,34 @@ Algorythms::BruteforceData Algorythms::bruteforceRecursiveLimited(int current, s
     }
     return BruteforceData();
 
+}
+
+int Algorythms::dynamicTSPDistanceF(int beginVert, std::vector<int> s, int dst, const NeighbourMatrix &m, std::vector<int>& path)
+{
+    if(s.size() == 1 && s[0] == dst) return m.edge(beginVert, dst);
+    else{
+        std::vector<int> newS = s;
+
+        for(unsigned int i=0;i<s.size();++i){
+            if(s[i] == dst) newS.erase(newS.begin()+i);
+        }
+
+        int minDistance = 0x0fffffff;
+        int vert = -1;
+        for(unsigned int i=0;i<newS.size();++i){
+            std::vector<int> p;
+            int d = dynamicTSPDistanceF(beginVert, newS, newS[i], m, p) + m.edge(newS[i],dst);
+
+            if(minDistance > d){
+                minDistance = d;
+                vert = newS[i];
+                path = p;
+            }
+        }
+
+        path.insert(path.begin(), vert);
+        //std::cout<<vert<<std::endl;
+        return minDistance;
+    }
 }
 

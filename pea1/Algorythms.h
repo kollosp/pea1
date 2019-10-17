@@ -17,6 +17,7 @@ class Algorythms
 
     static BruteforceData bruteforceRecursiveLimited(int current, std::vector<int> path, int distance, const NeighbourMatrix &m,
                                               std::vector<int>&currentMinPath, int& currentMinDistance);
+    static int dynamicTSPDistanceF(int beginVert, std::vector<int> s, int dst, const NeighbourMatrix &m, std::vector<int>& path);
 
 public:
     Algorythms();
@@ -86,6 +87,7 @@ public:
     static std::vector<int> bruteforceTSP(int beginVert, const NeighbourMatrix &m, int &distance);
     static std::vector<int> bruteforceTSPLimited(int beginVert, const NeighbourMatrix &m, int &distance);
     static std::vector<int> greedyTSP(int beginVert, const NeighbourMatrix &m, int &distance);
+    static std::vector<int> dinamicTSP(int beginVert, const NeighbourMatrix &m, int &distance);
 
 };
 

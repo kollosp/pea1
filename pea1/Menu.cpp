@@ -90,6 +90,7 @@ void Menu::run()
             case 5: bruteforce();    break;
             case 6: bruteforceLimited();    break;
             case 7: greedy();    break;
+            case 8: dinamic();    break;
             default: continue;
         }
 
@@ -124,6 +125,13 @@ void Menu::bruteforceLimited()
 void Menu::greedy()
 {
     int distance = 0;
-    std::cout<<"Rezultat metodu zachlannej TSP: "<<Algorythms::greedyTSP(0,graphMatrix, distance);
+    std::cout<<"Rezultat metody zachlannej TSP: "<<Algorythms::greedyTSP(0,graphMatrix, distance);
+    std::cout<<" dystans: "<<distance<<std::endl;
+}
+
+void Menu::dinamic()
+{
+    int distance = 0;
+    std::cout<<"Rezultat metody programowania dynamicznego TSP: "<<Algorythms::dinamicTSP(0,graphMatrix, distance);
     std::cout<<" dystans: "<<distance<<std::endl;
 }

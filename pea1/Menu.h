@@ -22,7 +22,7 @@ class Menu
                            " 5. TSP Metoda BruteForce\n"
                            " 6. TSP Metoda z ograniczeniami\n"
                            " 7. TSP Metoda zachlanna\n"
-                           " 8. \n"
+                           " 8. TSP Metoda prog. dynamicznego\n"
                            " 9. \n"
                            " 0. Wyjscie z programu";
 
@@ -46,6 +46,7 @@ public:
     void bruteforce();
     void bruteforceLimited();
     void greedy();
+    void dinamic();
 };
 
 template <typename T>
