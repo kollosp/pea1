@@ -15,15 +15,15 @@ class Menu
 {
 
     std::string mainMenu = "----Menu Glowne----\n"
-                           " 1. Wczytaj z pliku\n"
-                           " 2. Zapisz do pliku\n"
-                           " 3. Wygeneruj losowy\n"
-                           " 4. Wyswietl macierzowo\n"
-                           " 5. TSP Metoda BruteForce\n"
-                           " 6. TSP Metoda z ograniczeniami\n"
-                           " 7. TSP Metoda zachlanna\n"
-                           " 8. TSP Metoda prog. dynamicznego\n"
-                           " 9. \n"
+                           " 1. Wczytaj z pliku (format: macierz)\n"
+                           " 2. Wczytaj z pliku (format: lista krawedzi)\n"
+                           " 3. Zapisz do pliku\n"
+                           " 4. Wygeneruj losowy\n"
+                           " 5. Wyswietl macierzowo\n"
+                           " 6. TSP Metoda BruteForce\n"
+                           " 7. TSP Metoda z ograniczeniami\n"
+                           " 8. TSP Metoda zachlanna\n"
+                           " 9. TSP Metoda prog. dynamicznego\n"
                            " 0. Wyjscie z programu";
 
 
@@ -33,6 +33,7 @@ public:
     Menu();
 
     void fromFile();
+    void fromFileMatrixStyle();
     void toFile();
     void random();
 

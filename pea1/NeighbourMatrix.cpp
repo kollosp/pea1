@@ -40,7 +40,7 @@ bool NeighbourMatrix::addEdge(int vert1, int vert2, int factor, bool bidirection
         else{
             data[vert1][vert2] = factor;
 
-            //if(bidirectional)
+            if(bidirectional)
                 data[vert2][vert1] = factor;
         }
     }

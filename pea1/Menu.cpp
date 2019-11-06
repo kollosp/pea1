@@ -5,6 +5,8 @@ Menu::Menu()
 
 }
 
+
+
 void Menu::fromFile()
 {
     std::cout<<"Ladowanie grafu z pliku"<<std::endl;
@@ -13,11 +15,21 @@ void Menu::fromFile()
     std::cout<<"podaj sciezke do pliku: ";
     std::cin >> file;
 
-    char bidirectional = 'N';
-    std::cout<<"Wymys graf nieskierowany(N/T): ";
-    std::cin >> bidirectional;
+    Algorythms::fromFile(graphMatrix, file, false);
 
-    Algorythms::fromFile(graphMatrix, file, bidirectional == 'N' ? 0:1);
+    std::cout<<"Zaladowano"<<std::endl;
+
+}
+
+void Menu::fromFileMatrixStyle()
+{
+    std::cout<<"Ladowanie grafu z pliku (format macierzowy)"<<std::endl;
+
+    std::string file;
+    std::cout<<"podaj sciezke do pliku: ";
+    std::cin >> file;
+
+    Algorythms::fromFileMatrixStyle(graphMatrix, file, false);
 
     std::cout<<"Zaladowano"<<std::endl;
 
@@ -83,14 +95,15 @@ void Menu::run()
         tm.start();
 
         switch(d){
-            case 1: fromFile();      break;
-            case 2: toFile();        break;
-            case 3: random();        break;
-            case 4: displayMatrix(); break;
-            case 5: bruteforce();    break;
-            case 6: bruteforceLimited();    break;
-            case 7: greedy();    break;
-            case 8: dinamic();    break;
+            case 1: fromFileMatrixStyle(); break;
+            case 2: fromFile();            break;
+            case 3: toFile();              break;
+            case 4: random();              break;
+            case 5: displayMatrix();       break;
+            case 6: bruteforce();          break;
+            case 7: bruteforceLimited();   break;
+            case 8: greedy();              break;
+            case 9: dinamic();             break;
             default: continue;
         }
 

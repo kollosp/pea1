@@ -43,6 +43,29 @@ public:
         }
     }
 
+    template<typename T>
+    static void fromFileMatrixStyle(T& graph, const std::string& file, bool forceBidirectional=true)
+    {
+        std::ifstream f;
+        f.open(file, std::ios::in);
+
+        if(f.is_open()){
+            int size;
+            f>>size;
+
+            graph.init(size);
+
+            for(int j=0;j<size;++j){
+                for(int i=0;i<size;++i){
+                    int factor;
+                    f>>factor;
+
+                    graph.addEdge(j, i, factor, forceBidirectional);
+                }
+            }
+        }
+    }
+
     template<typename T1,typename T2>
     static void copy(const T1& src, T2& dst){
         dst.init(src.size());

@@ -92,10 +92,10 @@ std::vector<int> Algorythms::greedyTSP(int beginVert, const NeighbourMatrix &m, 
     distance += m.edge(path[path.size()-1], path[0]);
     path.push_back(path[0]);
 
-    for(int i:path){
+    /*for(int i:path){
         std::cout<<i<<" ";
     }
-    std::cout<<" | "<<distance<<std::endl;
+    std::cout<<" | "<<distance<<std::endl;*/
     return path;
 }
 
@@ -140,10 +140,10 @@ Algorythms::BruteforceData Algorythms::bruteforceRecursive(int current, std::vec
 
         if(path[0] != path[path.size()-1]) return BruteforceData();
 
-        for(int i:path){
+        /*for(int i:path){
             std::cout<<i<<" ";
         }
-        std::cout<<" | "<<distance<<std::endl;
+        std::cout<<" | "<<distance<<std::endl;*/
 
         if(currentMinDistance > distance){
             currentMinDistance = distance;
