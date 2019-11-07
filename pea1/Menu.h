@@ -21,7 +21,7 @@ class Menu
                            " 4. Wygeneruj losowy\n"
                            " 5. Wyswietl macierzowo\n"
                            " 6. TSP Metoda BruteForce\n"
-                           " 7. TSP Metoda z ograniczeniami\n"
+                           " 7. TSP Metoda B&B wglab\n"
                            " 8. TSP Metoda zachlanna\n"
                            " 9. TSP Metoda prog. dynamicznego\n"
                            " 0. Wyjscie z programu";
@@ -31,6 +31,8 @@ class Menu
 
 public:
     Menu();
+
+    void initFromFile(const std::__cxx11::string &path);
 
     void fromFile();
     void fromFileMatrixStyle();

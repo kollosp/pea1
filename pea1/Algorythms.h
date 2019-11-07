@@ -17,9 +17,26 @@ class Algorythms
 
     static BruteforceData bruteforceRecursiveLimited(int current, std::vector<int> path, int distance, const NeighbourMatrix &m,
                                               std::vector<int>&currentMinPath, int& currentMinDistance);
-    static int dynamicTSPDistanceF(int beginVert, std::vector<int> s, int dst, const NeighbourMatrix &m, std::vector<int>& path);
+    /**
+     * @brief dynamicTSPDistanceF
+     * @param beginVert
+     * @param s wierzcholki przez ktore nalezy przejsc do wierzcholka docelowego
+     * @param dst
+     * @param m
+     * @param path
+     * @param array tablica zawierajaca tyle elemntow ile istnieje sciezek czyli
+     * @param arraySize - w c++ nie mozna przekazac tablicy dwuwymiarowej bez podania przynajmniej jednego wymiaru.
+     *              dlatego tablica dwuwymiarowa zostala zastapiona jednowymiarowa z indeksowaniem [i + size*j] i jest indeksem wiersza
+     *              a j jest indeksem kolumny
+     * @return
+     */
+    static int dynamicTSPDistanceF(int beginVert, unsigned int s, unsigned int dst,
+                                   const NeighbourMatrix &m, std::vector<int>& path, unsigned int *array, unsigned int *paths, int arraySize);
+
 
 public:
+    static int log2(int a);
+
     Algorythms();
 
     template<typename T>

@@ -12,10 +12,23 @@ void pause(){
 }
 
 
-int main()
+int main(int argc, char* argv[])
 {
+//    cout<<Algorythms::log2(1)<<endl;
+//    cout<<Algorythms::log2(2)<<endl;
+//    cout<<Algorythms::log2(4)<<endl;
+//    cout<<Algorythms::log2(8)<<endl;
+//    cout<<Algorythms::log2(16)<<endl;
+//    cout<<Algorythms::log2(32)<<endl;
+
     srand(time(NULL));
     Menu m;
+
+
+    if(argc >= 1){
+        m.initFromFile(argv[1]);
+    }
+
     m.run();
 
 

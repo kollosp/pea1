@@ -5,6 +5,11 @@ Menu::Menu()
 
 }
 
+void Menu::initFromFile(const std::string& path)
+{
+    Algorythms::fromFileMatrixStyle(graphMatrix, path, false);
+}
+
 
 
 void Menu::fromFile()

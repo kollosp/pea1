@@ -1,4 +1,5 @@
 #include "Algorythms.h"
+#include <bitset>
 
 Algorythms::Algorythms()
 {
@@ -101,15 +102,35 @@ std::vector<int> Algorythms::greedyTSP(int beginVert, const NeighbourMatrix &m, 
 
 std::vector<int> Algorythms::dinamicTSP(int beginVert, const NeighbourMatrix &m, int &distance)
 {
-    std::vector<int> s;
-    for(int i=0;i<m.size();++i)
-        s.push_back(i);
+    int s=1;
+    for(int i=0;i<m.size();++i){
+        s<<=1;
+        ++s;
+    }
+
+    unsigned int array[s*s];
+    unsigned int paths[s*s];
+
+    for(int i=0;i<s;++i){
+        for(int j=0;j<s;++j){
+            array[i+s*j] = 0;
+            paths[i+s*j] = 0;
+        }
+    }
 
     std::vector<int> path;
-    distance = dynamicTSPDistanceF(beginVert, s, beginVert, m, path);
 
-    path.insert(path.begin(), beginVert);
-    path.push_back(beginVert);
+    try{
+
+        distance = dynamicTSPDistanceF(beginVert, s, 1, m, path, array, paths, s);
+
+        //dolicz powrot do wierzchołka startowego
+        distance += m.edge(path[path.size()-1], beginVert);
+        path.push_back(beginVert);
+    }
+    catch(const char* err){
+        std::cout<<err<<std::endl;
+    }
 
     return path;
 }
@@ -193,32 +214,73 @@ Algorythms::BruteforceData Algorythms::bruteforceRecursiveLimited(int current, s
 
 }
 
-int Algorythms::dynamicTSPDistanceF(int beginVert, std::vector<int> s, int dst, const NeighbourMatrix &m, std::vector<int>& path)
+int Algorythms::dynamicTSPDistanceF(int beginVert, unsigned int s, unsigned int dst, const NeighbourMatrix &m, std::vector<int>& path,
+                                    unsigned int *array, unsigned int *paths, int arraySize)
 {
-    if(s.size() == 1 && s[0] == dst) return m.edge(beginVert, dst);
+    //jezeli s zawiera tylko jedna jedynke (jest potega dwojki) to znaczy ze
+    //podana poszukiwana jest droga dlugosci 1
+    if(s != 0 && (s & (s-1)) == 0 && s == dst) {
+        std::cout<<"koniec"<<std::endl;
+        return m.edge(beginVert, log2(dst)-1);
+    }
     else{
-        std::vector<int> newS = s;
+        int newS = s;
 
-        for(unsigned int i=0;i<s.size();++i){
-            if(s[i] == dst) newS.erase(newS.begin()+i);
-        }
+        //usun dst z aktualnego wektora miast przez ktore trzeba przejsc
+        newS = newS & (~dst); //usun bit miasta przeznaczenia z wektora miast do odwiedzenia
 
         int minDistance = 0x0fffffff;
         int vert = -1;
-        for(unsigned int i=0;i<newS.size();++i){
-            std::vector<int> p;
-            int d = dynamicTSPDistanceF(beginVert, newS, newS[i], m, p) + m.edge(newS[i],dst);
+        int j=1;
 
-            if(minDistance > d){
-                minDistance = d;
-                vert = newS[i];
-                path = p;
+
+        for(unsigned int i=0;i<sizeof(s)*8;++i){
+
+            //jezeli i-te miasto nalezy do wektora miast do odwiedzenia
+            if((j & newS) > 0){
+                std::vector<int> p;
+
+                std::bitset<8> x(s);
+                std::cout<<"s: "<<s<<"("<<x<<") "<<dst<<std::endl;
+                std::cout<<"j "<<j<<" "<<log2(j)<<" "<<log2(dst)<<" "<<newS<<std::endl;
+
+                int d = array[newS + j*arraySize];
+
+                //jezeli dana tablica zostala juz kiedys policzona
+                if(d == 0){
+                    d = dynamicTSPDistanceF(beginVert, newS, j, m, p, array, paths, arraySize);
+                    array[newS + j*arraySize] = d;
+                    paths[s + j*arraySize] = newS;
+                }
+
+                d += m.edge(log2(j)-1,log2(dst)-1);
+
+                if(minDistance > d){
+                    minDistance = d;
+                    vert = log2(j) -1;
+                    path = p;
+                }
             }
+
+            //aktualnie przetwarzany wierzcholek. j zawsze zawiera jedna jedynke
+            j<<=1;
         }
 
-        path.insert(path.begin(), vert);
         //std::cout<<vert<<std::endl;
+        path.insert(path.end(), vert);
         return minDistance;
     }
+}
+
+int Algorythms::log2(int a)
+{
+    int i=0;
+    if(a>0) a >>= 1;
+
+    while(a){
+        a>>=1;
+        ++i;
+    }
+    return i;
 }
 
