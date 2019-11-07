@@ -118,21 +118,23 @@ std::vector<int> Algorythms::dinamicTSP(int beginVert, const NeighbourMatrix &m,
         }
     }
 
-    std::vector<int> path;
-
     try{
 
-        distance = dynamicTSPDistanceF(beginVert, s, 1, m, path, array, paths, s);
+        distance = dynamicTSPDistanceF(beginVert, s, 1, m, array, paths, s);
 
-        //dolicz powrot do wierzchołka startowego
-        distance += m.edge(path[path.size()-1], beginVert);
-        path.push_back(beginVert);
+
     }
     catch(const char* err){
         std::cout<<err<<std::endl;
     }
 
-    return path;
+    std::vector<int> p = refactorDynamicTSPPath(s, 1, paths, s);
+
+    //dolicz powrot do wierzchołka startowego
+    distance += m.edge(p[p.size()-1], beginVert);
+    p.push_back(beginVert);
+
+    return p;
 }
 
 
@@ -214,62 +216,94 @@ Algorythms::BruteforceData Algorythms::bruteforceRecursiveLimited(int current, s
 
 }
 
-int Algorythms::dynamicTSPDistanceF(int beginVert, unsigned int s, unsigned int dst, const NeighbourMatrix &m, std::vector<int>& path,
-                                    unsigned int *array, unsigned int *paths, int arraySize)
+int Algorythms::dynamicTSPDistanceF(int beginVert, unsigned int s, unsigned int dst, const NeighbourMatrix &m,
+                                    unsigned int *array, unsigned int *paths, int arraySize, std::string string)
 {
+    int d = 0;
+    int vert = 0;
+
     //jezeli s zawiera tylko jedna jedynke (jest potega dwojki) to znaczy ze
     //podana poszukiwana jest droga dlugosci 1
     if(s != 0 && (s & (s-1)) == 0 && s == dst) {
-        std::cout<<"koniec"<<std::endl;
-        return m.edge(beginVert, log2(dst)-1);
+        d = m.edge(beginVert, log2(dst)-1);
+        vert = -1;
     }
     else{
         int newS = s;
-
+        int tDst = ~dst;
         //usun dst z aktualnego wektora miast przez ktore trzeba przejsc
-        newS = newS & (~dst); //usun bit miasta przeznaczenia z wektora miast do odwiedzenia
+        newS = newS & tDst; //usun bit miasta przeznaczenia z wektora miast do odwiedzenia
 
-        int minDistance = 0x0fffffff;
-        int vert = -1;
+        d = 0x0fffffff;
         int j=1;
 
+        if(array[s + dst*arraySize] > 0){
+            return array[s + dst*arraySize];
+        }
 
         for(unsigned int i=0;i<sizeof(s)*8;++i){
 
             //jezeli i-te miasto nalezy do wektora miast do odwiedzenia
             if((j & newS) > 0){
-                std::vector<int> p;
-
-                std::bitset<8> x(s);
-                std::cout<<"s: "<<s<<"("<<x<<") "<<dst<<std::endl;
-                std::cout<<"j "<<j<<" "<<log2(j)<<" "<<log2(dst)<<" "<<newS<<std::endl;
-
-                int d = array[newS + j*arraySize];
 
                 //jezeli dana tablica zostala juz kiedys policzona
-                if(d == 0){
-                    d = dynamicTSPDistanceF(beginVert, newS, j, m, p, array, paths, arraySize);
-                    array[newS + j*arraySize] = d;
-                    paths[s + j*arraySize] = newS;
-                }
+                int distance = dynamicTSPDistanceF(beginVert, newS, j, m, array, paths, arraySize, string + " ") +
+                        m.edge(log2(j)-1,log2(dst)-1);
 
-                d += m.edge(log2(j)-1,log2(dst)-1);
-
-                if(minDistance > d){
-                    minDistance = d;
-                    vert = log2(j) -1;
-                    path = p;
+                if(d > distance){
+                    d = distance;
+                    vert = j;
                 }
             }
 
             //aktualnie przetwarzany wierzcholek. j zawsze zawiera jedna jedynke
             j<<=1;
         }
+   }
 
-        //std::cout<<vert<<std::endl;
-        path.insert(path.end(), vert);
-        return minDistance;
+    std::bitset<8> x(s);
+    std::bitset<8> y(dst);
+    std::cout<<string + "s: "<<s<<"("<<x<<") "<<dst<<"("<<y<<") d: "<<d<<" vert: "<<vert<<std::endl;
+    array[s + dst*arraySize] = d;
+
+    //zeby dosc do dst przechodzac przez wszystkie wierzcholki w s nalezy przejsc przez
+    //vert (vert zawiera o jedna jedynke mniej niz s)
+    paths[s + dst*arraySize] = vert;
+
+    return d;
+}
+
+std::vector<int> Algorythms::refactorDynamicTSPPath(int start, int dst, unsigned int *paths, int arraySize)
+{
+    std::vector<int> path;
+
+    int lastS = start;
+    int lastDst = dst;
+
+    while(lastDst > 0){
+
+
+        int buf= paths[lastS + arraySize*lastDst];
+        lastS &= ~lastDst;
+        lastDst = buf;
+
+        path.push_back(log2(lastS)-1);
+
+        //std::bitset<8> x(lastS);
+        //std::bitset<8> y(lastDst);
+        //std::cout<<lastS<<"("<<x<<") "<<lastDst<<"("<<y<<")"<<std::endl;
     }
+
+    //usuniecie -1 ze sciezki
+    path.erase(path.end()-1);
+
+    std::vector<int> ret;
+
+    for(int i=path.size()-1;i>=0;--i){
+        ret.push_back(path[i]);
+    }
+
+    return ret;
 }
 
 int Algorythms::log2(int a)

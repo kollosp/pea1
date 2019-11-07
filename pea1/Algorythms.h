@@ -31,8 +31,8 @@ class Algorythms
      * @return
      */
     static int dynamicTSPDistanceF(int beginVert, unsigned int s, unsigned int dst,
-                                   const NeighbourMatrix &m, std::vector<int>& path, unsigned int *array, unsigned int *paths, int arraySize);
-
+                                   const NeighbourMatrix &m, unsigned int *array, unsigned int *paths, int arraySize, std::string string="");
+    static std::vector<int> refactorDynamicTSPPath(int start, int dst, unsigned int *paths, int arraySize);
 
 public:
     static int log2(int a);
