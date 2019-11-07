@@ -10,6 +10,13 @@ void Menu::initFromFile(const std::string& path)
     Algorythms::fromFileMatrixStyle(graphMatrix, path, false);
 }
 
+void Menu::test()
+{
+    std::vector<int> v = {0,1,2};
+    std::cout<<graphMatrix.complement(v)<<std::endl;
+
+}
+
 
 
 void Menu::fromFile()
@@ -108,7 +115,7 @@ void Menu::run()
             case 6: bruteforce();          break;
             case 7: bruteforceLimited();   break;
             case 8: greedy();              break;
-            case 9: dinamic();             break;
+            case 9: dynamic();             break;
             default: continue;
         }
 
@@ -147,9 +154,9 @@ void Menu::greedy()
     std::cout<<" dystans: "<<distance<<std::endl;
 }
 
-void Menu::dinamic()
+void Menu::dynamic()
 {
     int distance = 0;
-    std::cout<<"Rezultat metody programowania dynamicznego TSP: "<<Algorythms::dinamicTSP(0,graphMatrix, distance);
+    std::cout<<"Rezultat metody programowania dynamicznego TSP: "<<Algorythms::dynamicTSP(0,graphMatrix, distance);
     std::cout<<" dystans: "<<distance<<std::endl;
 }

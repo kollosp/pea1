@@ -33,6 +33,7 @@ public:
     Menu();
 
     void initFromFile(const std::__cxx11::string &path);
+    void test();
 
     void fromFile();
     void fromFileMatrixStyle();
@@ -49,7 +50,7 @@ public:
     void bruteforce();
     void bruteforceLimited();
     void greedy();
-    void dinamic();
+    void dynamic();
 };
 
 template <typename T>

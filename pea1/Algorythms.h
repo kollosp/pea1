@@ -35,7 +35,8 @@ class Algorythms
     static std::vector<int> refactorDynamicTSPPath(int start, int dst, unsigned int *paths, int arraySize);
 
 public:
-    static int log2(int a);
+    static int log2(unsigned int a);
+    static int countOnes(unsigned int a);
 
     Algorythms();
 
@@ -113,7 +114,7 @@ public:
     template<typename T>
     static void fillGraph(T &graph, int fillFactor){
         int edges = ((float)graph.size()*(graph.size()-1)) * fillFactor/100.0;
-        edges /= 2;
+        //edges /= 2;
         int size = graph.size();
 
         for(int i=0;i<edges;){
@@ -127,8 +128,7 @@ public:
     static std::vector<int> bruteforceTSP(int beginVert, const NeighbourMatrix &m, int &distance);
     static std::vector<int> bruteforceTSPLimited(int beginVert, const NeighbourMatrix &m, int &distance);
     static std::vector<int> greedyTSP(int beginVert, const NeighbourMatrix &m, int &distance);
-    static std::vector<int> dinamicTSP(int beginVert, const NeighbourMatrix &m, int &distance);
-
+    static std::vector<int> dynamicTSP(int beginVert, const NeighbourMatrix &m, int &distance);
 };
 
 #endif // ALGORYTHMS_H

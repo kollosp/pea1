@@ -25,8 +25,11 @@ int main(int argc, char* argv[])
     Menu m;
 
 
-    if(argc >= 1){
+    if(argc >= 2){
         m.initFromFile(argv[1]);
+        m.dynamic();
+        //m.test();
+        //return 0;
     }
 
     m.run();

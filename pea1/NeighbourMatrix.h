@@ -68,6 +68,15 @@ public:
      */
     std::vector<int> edges() const;
 
+    /**
+     * @brief sumMinimumEdgesOfVerts
+     * @param verts
+     * @return
+     */
+    int sumMinimumEdgesOfVerts(const std::vector<int>& verts) const;
+
+    std::vector<int> complement(const std::vector<int>& verts) const;
+
 };
 
 std::ostream& operator << (std::ostream& str, const NeighbourMatrix& matrix);

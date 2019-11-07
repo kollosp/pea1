@@ -118,6 +118,46 @@ std::vector<int> NeighbourMatrix::edges() const
     return edg;
 }
 
+int NeighbourMatrix::sumMinimumEdgesOfVerts(const std::vector<int> &verts) const
+{
+    //zusumuj minima
+    int ret = 0;
+    for(int i:verts){
+        int minimum = 0x0fffffff;
+
+        //sprawdz krawedz minimalnej dlugosci wychodzacej z wierzcholka i
+        for(int j=0;j<size();++j){
+            if(minimum  > data[i][j] && i!=j){
+                minimum = data[i][j];
+            }
+        }
+
+        ret += minimum;
+    }
+
+    return ret;
+}
+
+std::vector<int> NeighbourMatrix::complement(const std::vector<int> &verts) const
+{
+    std::vector<int> ret;
+    for(int i=0;i<size();++i){
+        bool contains = false;
+
+        for(int j:verts){
+            if(j == i){
+                contains = true;
+                break;
+            }
+        }
+
+        if(contains == false)
+            ret.push_back(i);
+    }
+
+    return ret;
+}
+
 std::ostream &operator <<(std::ostream &str, const NeighbourMatrix &matrix)
 {
     str<<std::setw(4)<<"\\";
