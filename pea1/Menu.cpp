@@ -136,7 +136,7 @@ void Menu::pause()
 void Menu::bruteforce()
 {
     int distance = 0;
-    std::cout<<"Rezultat metody brute force TSP: "<<Algorythms::bruteforceTSP(0,graphMatrix, distance);
+    std::cout<<"Rezultat metody brute force TSP: "<<Algorythms::bruteforceTSPIter(0,graphMatrix, distance);
     std::cout<<" dystans: "<<distance<<std::endl;
 }
 

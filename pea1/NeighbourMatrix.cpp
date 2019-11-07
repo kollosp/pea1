@@ -76,6 +76,9 @@ void NeighbourMatrix::init(int verts)
 
 int NeighbourMatrix::edge(int vert1, int vert2) const
 {
+    if(vert1 == vert2)
+        return 0;
+
     if(vert1 < verts && vert2 < verts){
         return data[vert1][vert2];
     }

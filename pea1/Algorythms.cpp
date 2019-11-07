@@ -6,6 +6,97 @@ Algorythms::Algorythms()
 
 }
 
+std::vector<unsigned int> Algorythms::bruteforceTSPIter(int beginVert, const NeighbourMatrix &m, int &distance)
+{
+    class Destination {
+    public:
+        Destination(unsigned int _vert, unsigned int _depth): vert(_vert), depth(_depth) {}
+        unsigned int vert;
+        unsigned int depth;
+    };
+
+    std::vector<Destination> queue;
+    queue.push_back(Destination(beginVert, 0));
+    //parametry najlepsze osiagniete
+    unsigned int minDistance = 0x0fffffff;
+    std::vector<unsigned int> minPath;
+
+    //parametry biezace
+    std::vector<unsigned int> path;
+    //path.push_back(beginVert);
+    distance = 0;
+
+    int lastDepth = -1;
+
+    while (!queue.empty()) {
+
+
+        //kolejka FILO
+        Destination d = queue[queue.size()-1];
+        queue.erase(queue.end()-1);
+
+        //jezeli nastapil powrot na wyzsza glebokosc
+        while(lastDepth >= (signed) d.depth){
+            //usuniecie dystansu
+            distance -= m.edge(path[path.size()-2],path[path.size()-1]);
+            path.erase(path.end()-1);
+            lastDepth--;
+        }
+
+        //dopisz wierzcholek do sciezki i dodaj droge
+        path.push_back(d.vert);
+
+        if(path.size() >= 2)
+            distance += m.edge(path[path.size()-2],path[path.size()-1]);
+
+        //dodaj wszystkich sasiadow wierzcholka ktorzy nie wystapili jeszcze w
+        //sciezce do kolejki
+        std::vector<int> neighbours = m.neighbours(d.vert);
+        bool allUsed = true;
+        for(int i:neighbours){
+            bool used = false;
+            for(int j:path){
+                if(i == j){
+                    used = true;
+                    break;
+                }
+            }
+
+            //wierzcholek nie zosttal wczesniej uzyty
+            if(!used){
+                allUsed = false;
+                queue.push_back(Destination(i,d.depth+1));
+            }
+
+        }
+
+        //jezeli nie ma kolejnych wierzcholkow do rozpatrzenia
+        //sprawdz czy nie zostala znaleziona nowa najlepsza opcja
+        if(allUsed){
+
+            //dodanie powrotu
+            unsigned int fullD = distance + m.edge(path[path.size()-1],beginVert);
+
+            if(fullD < minDistance){
+                minDistance = fullD;
+                minPath = path;
+            }
+        }
+
+//        for(int i:path){
+//            std::cout<<i<<" ";
+//        }
+//        std::cout<<"| "<<distance<<", "<<d.depth<<std::endl;
+
+        //zapisanie poprzedniego stanu glegokosci zeby okreslic co nalezy zrobic ze sciezka
+        lastDepth = d.depth;
+    }
+
+    distance = minDistance;
+    minPath.push_back(beginVert);
+    return minPath;
+}
+
 std::vector<int> Algorythms::bruteforceTSP(int beginVert, const NeighbourMatrix &m, int&distance)
 {
 
@@ -48,7 +139,6 @@ std::vector<int> Algorythms::bruteforceTSPLimited(int beginVert, const Neighbour
 std::vector<int> Algorythms::greedyTSP(int beginVert, const NeighbourMatrix &m, int &distance)
 {
 
-    //7(111)/4(100)
     std::vector<int> path;
     path.push_back(beginVert);
 
@@ -109,36 +199,38 @@ std::vector<int> Algorythms::dynamicTSP(int beginVert, const NeighbourMatrix &m,
         s<<=1;
         ++s;
     }
-    s++;
-    unsigned int *array = new unsigned int[s*s];
-    unsigned int *paths = new unsigned int[s*s];
 
-    for(int i=0;i<s;++i){
-        for(int j=0;j<s;++j){
-            array[i+s*j] = 0;
-            paths[i+s*j] = 0;
+    unsigned int size = s+1;
+    unsigned int *array = new unsigned int[size*size];
+    unsigned int *paths = new unsigned int[size*size];
+
+    std::cout<<"Zajeta pamiec: "<<sizeof(unsigned int) *size*size / 1024 / 1024<<" MB" <<std::endl;
+
+    for(int i=0;i<size;++i){
+        for(int j=0;j<size;++j){
+            array[i+size*j] = 0;
+            paths[i+size*j] = 0;
         }
     }
 
     try{
 
-        distance = dynamicTSPDistanceF(beginVert, s-1, 1, m, array, paths, s);
-
+        distance = dynamicTSPDistanceF(beginVert, s, 1, m, array, paths, size);
 
     }
     catch(const char* err){
         std::cout<<err<<std::endl;
     }
 
-    /*std::vector<int> p = refactorDynamicTSPPath(s, 1, paths, s);
+    std::vector<int> p = refactorDynamicTSPPath(s, 1, paths, size);
 
     //dolicz powrot do wierzchołka startowego
-    distance += m.edge(p[p.size()-1], beginVert);
+    //distance += m.edge(p[p.size()-1], beginVert);
     p.push_back(beginVert);
-*/
-/*    for(int i=0;i<s;++i){
-        for(int j=0;j<s;++j){
-            std::cout<<array[i+s*j]<<" ";
+
+/*    for(int i=0;i<size;++i){
+        for(int j=0;j<size;++j){
+            std::cout<<array[i+size*j]<<" ";
         }
         std::cout<<std::endl;
     }*/
@@ -146,7 +238,7 @@ std::vector<int> Algorythms::dynamicTSP(int beginVert, const NeighbourMatrix &m,
     delete []array;
     delete []paths;
 
-    return std::vector<int>();
+    return p;
 }
 
 
@@ -258,9 +350,9 @@ int Algorythms::dynamicTSPDistanceF(int beginVert, unsigned int s, unsigned int 
 
         unsigned int newS = d.s - d.dst;
 
+        //rozwiniecie przypadku podstawowego
         if(newS == 0){
             array[d.s + d.dst*arraySize] = m.edge(beginVert, log2(d.dst)-1);
-            //std::cout<<"koniec "<<beginVert<<" "<<d.dst<<" "<<log2(d.dst)-1<<" "<<m.edge(beginVert, log2(d.dst)-1)<<std::endl;
         }
 
         unsigned int j=1;
@@ -271,9 +363,12 @@ int Algorythms::dynamicTSPDistanceF(int beginVert, unsigned int s, unsigned int 
                     unsigned int depth = countOnes(newS);
                     q.push_back(Destination(newS,j, depth));
 
+                    //bez przypadkow podstawowych. wszystkie sa rozwiazywane w powyzej
                     if(depth > 1)
                         queue.push_back(Destination(newS,j, depth));
 
+                    //okreslenie ze dane rozwiniecie zostalo juz wykonane i nie
+                    //nalezy go powtarzac
                     array[newS + j*arraySize]  = -1;
                 }
             }
@@ -307,10 +402,15 @@ int Algorythms::dynamicTSPDistanceF(int beginVert, unsigned int s, unsigned int 
         unsigned int j=1;
         unsigned int buf;
         min = 0x0fffffff;
+
+        //usuniecie miasta docelowe z wektora s aby pozniej moc znalezc minimum
+        //z sciezek od 0 do d.dst
         unsigned int newS = d.s-d.dst;
         unsigned int previous = 0;
 
+
         while(j <= newS){
+            //
             if((newS & j) > 0){
                 buf = array[newS + j*arraySize];
 
@@ -324,7 +424,7 @@ int Algorythms::dynamicTSPDistanceF(int beginVert, unsigned int s, unsigned int 
         }
 
         array[d.s + d.dst*arraySize] = min + m.edge(log2(previous)-1, log2(d.dst)-1);
-
+        paths[d.s + d.dst*arraySize] = previous;
    }
 
     return array[s + dst * arraySize];
@@ -339,11 +439,17 @@ std::vector<int> Algorythms::refactorDynamicTSPPath(int start, int dst, unsigned
 
     while(lastDst > 0){
 
-        int buf= paths[lastS + arraySize*lastDst];
+        int buf = paths[lastS + arraySize*lastDst];
         lastS &= ~lastDst;
         lastDst = buf;
 
-        path.push_back(log2(lastS)-1);
+        path.push_back(log2(lastDst)-1);
+
+
+        std::bitset<8> x(lastS);
+        std::bitset<8> y(lastDst);
+        std::cout<<"s: "<<lastS<<"("<<x<<") "<<lastDst<<"("<<y<<") "<<path[path.size()-1]<<std::endl;
+
     }
 
     std::vector<int> ret;

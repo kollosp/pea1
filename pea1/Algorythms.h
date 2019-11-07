@@ -15,6 +15,9 @@ class Algorythms
     static BruteforceData bruteforceRecursive(int current, std::vector<int> path, int distance, const NeighbourMatrix &m,
                                               std::vector<int>&currentMinPath, int& currentMinDistance);
 
+
+
+
     static BruteforceData bruteforceRecursiveLimited(int current, std::vector<int> path, int distance, const NeighbourMatrix &m,
                                               std::vector<int>&currentMinPath, int& currentMinDistance);
     /**
@@ -124,6 +127,9 @@ public:
                 if(graph.addEdge(v1,v2, (rand()%9)+1, false) == false) ++i;
         }
     }
+
+    static std::vector<unsigned int> bruteforceTSPIter(int beginVert, const NeighbourMatrix &m, int &distance);
+
 
     static std::vector<int> bruteforceTSP(int beginVert, const NeighbourMatrix &m, int &distance);
     static std::vector<int> bruteforceTSPLimited(int beginVert, const NeighbourMatrix &m, int &distance);
