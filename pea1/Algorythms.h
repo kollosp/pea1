@@ -129,6 +129,7 @@ public:
     }
 
     static std::vector<unsigned int> bruteforceTSPIter(int beginVert, const NeighbourMatrix &m, int &distance);
+    static std::vector<unsigned int> BAndBTSPIter(int beginVert, const NeighbourMatrix &m, int &distance);
 
 
     static std::vector<int> bruteforceTSP(int beginVert, const NeighbourMatrix &m, int &distance);

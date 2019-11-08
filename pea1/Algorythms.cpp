@@ -97,6 +97,100 @@ std::vector<unsigned int> Algorythms::bruteforceTSPIter(int beginVert, const Nei
     return minPath;
 }
 
+std::vector<unsigned int> Algorythms::BAndBTSPIter(int beginVert, const NeighbourMatrix &m, int &distance)
+{
+    class Destination {
+    public:
+        Destination(unsigned int _vert, unsigned int _depth): vert(_vert), depth(_depth) {}
+        unsigned int vert;
+        unsigned int depth;
+    };
+
+    std::vector<Destination> queue;
+    queue.push_back(Destination(beginVert, 0));
+    //parametry najlepsze osiagniete
+    unsigned int minDistance = 0x0fffffff;
+    std::vector<unsigned int> minPath;
+
+    //parametry biezace
+    std::vector<unsigned int> path;
+    //path.push_back(beginVert);
+    distance = 0;
+
+    int lastDepth = -1;
+
+    while (!queue.empty()) {
+
+
+        //kolejka FILO
+        Destination d = queue[queue.size()-1];
+        queue.erase(queue.end()-1);
+
+        //jezeli nastapil powrot na wyzsza glebokosc
+        while(lastDepth >= (signed) d.depth){
+            //usuniecie dystansu
+            distance -= m.edge(path[path.size()-2],path[path.size()-1]);
+            path.erase(path.end()-1);
+            lastDepth--;
+        }
+
+        //dopisz wierzcholek do sciezki i dodaj droge
+        path.push_back(d.vert);
+
+        if(path.size() >= 2)
+            distance += m.edge(path[path.size()-2],path[path.size()-1]);
+
+
+        //dodaj wszystkich sasiadow wierzcholka ktorzy nie wystapili jeszcze w
+        //sciezce do kolejki i dla których przeszukiwanie ma jeszcze sens
+        std::vector<int> neighbours = m.neighbours(d.vert);
+        bool allUsed = true;
+        for(int i:neighbours){
+            bool used = false;
+            for(int j:path){
+                if(i == j){
+                    used = true;
+                    break;
+                }
+            }
+
+
+            //wierzcholek nie zosttal wczesniej uzyty
+            if(!used){
+                allUsed = false;
+
+                unsigned int lower = m.sumMinimumEdgesOfVerts(m.complement(path)) + distance;
+                unsigned int higher = distance + m.edge(d.vert,  i);
+
+                if(higher < minDistance && lower < minDistance)
+                    queue.push_back(Destination(i,d.depth+1));
+            }
+
+        }
+
+        //jezeli nie ma kolejnych wierzcholkow do rozpatrzenia
+        //sprawdz czy nie zostala znaleziona nowa najlepsza opcja
+        if(allUsed){
+
+            //dodanie powrotu
+            unsigned int fullD = distance + m.edge(path[path.size()-1],beginVert);
+
+            if(fullD < minDistance){
+                minDistance = fullD;
+                minPath = path;
+            }
+        }
+
+        //zapisanie poprzedniego stanu glegokosci zeby okreslic co nalezy zrobic ze sciezka
+        lastDepth = d.depth;
+    }
+
+    distance = minDistance;
+    minPath.push_back(beginVert);
+    return minPath;
+
+}
+
 std::vector<int> Algorythms::bruteforceTSP(int beginVert, const NeighbourMatrix &m, int&distance)
 {
 

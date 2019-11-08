@@ -141,6 +141,26 @@ int NeighbourMatrix::sumMinimumEdgesOfVerts(const std::vector<int> &verts) const
     return ret;
 }
 
+std::vector<int> NeighbourMatrix::complement(const std::vector<unsigned int> &verts) const
+{
+    std::vector<int> ret;
+    for(int i=0;i<size();++i){
+        bool contains = false;
+
+        for(int j:verts){
+            if(j == i){
+                contains = true;
+                break;
+            }
+        }
+
+        if(contains == false)
+            ret.push_back(i);
+    }
+
+    return ret;
+}
+
 std::vector<int> NeighbourMatrix::complement(const std::vector<int> &verts) const
 {
     std::vector<int> ret;

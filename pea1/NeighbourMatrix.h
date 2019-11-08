@@ -75,7 +75,8 @@ public:
      */
     int sumMinimumEdgesOfVerts(const std::vector<int>& verts) const;
 
-    std::vector<int> complement(const std::vector<int>& verts) const;
+    std::vector<int> complement(const std::vector<unsigned int> &verts) const;
+    std::vector<int> complement(const std::vector<int> &verts) const;
 
 };
 

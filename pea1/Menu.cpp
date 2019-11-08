@@ -143,7 +143,7 @@ void Menu::bruteforce()
 void Menu::bruteforceLimited()
 {
     int distance = 0;
-    std::cout<<"Rezultat metody z ograniczeniami TSP: "<<Algorythms::bruteforceTSPLimited(0,graphMatrix, distance);
+    std::cout<<"Rezultat metody z ograniczeniami TSP: "<<Algorythms::BAndBTSPIter(0,graphMatrix, distance);
     std::cout<<" dystans: "<<distance<<std::endl;
 }
 
