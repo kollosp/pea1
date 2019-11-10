@@ -120,7 +120,7 @@ void Menu::run()
         }
 
         tm.stop();
-        std::cout<<"czas wykonania: "<<tm.elapsed()<<std::endl;
+        std::cout<<"czas wykonania: "<<std::fixed<<tm.elapsed()*1000<<" ms"<<std::endl;
         pause();
 
     }while(d!=0);

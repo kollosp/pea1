@@ -3,6 +3,9 @@
 
 #include "NeighbourMatrix.h"
 
+//TSP15 B&B  61.5751  [0 12 1 14 8 4 6 2 11 13 9 7 5 3 10 0]
+
+
 class Algorythms
 {
     class BruteforceData{

@@ -27,9 +27,22 @@ std::vector<unsigned int> Algorythms::bruteforceTSPIter(int beginVert, const Nei
     distance = 0;
 
     int lastDepth = -1;
+    unsigned long long iterations = 0;
+    unsigned long long  fullIterations = 1;
+
+    //policz ilosc permutacji
+    for(int i=2;i<=m.size();++i){
+        fullIterations *=i;
+    }
+
+    std::cout<<"iteracji: "<<fullIterations<<std::endl;
 
     while (!queue.empty()) {
 
+        iterations ++;
+
+        if(iterations % 1000 == 0)
+            std::cout<<"\r"<<iterations *100000/ fullIterations * 0.001<<" %, iteracja: "<<iterations;
 
         //kolejka FILO
         Destination d = queue[queue.size()-1];
@@ -94,6 +107,7 @@ std::vector<unsigned int> Algorythms::bruteforceTSPIter(int beginVert, const Nei
 
     distance = minDistance;
     minPath.push_back(beginVert);
+    std::cout<<std::endl;
     return minPath;
 }
 
@@ -118,9 +132,22 @@ std::vector<unsigned int> Algorythms::BAndBTSPIter(int beginVert, const Neighbou
     distance = 0;
 
     int lastDepth = -1;
+    unsigned long long iterations = 0;
+    unsigned long long  fullIterations = 1;
+
+    //policz ilosc permutacji
+    for(int i=2;i<=m.size();++i){
+        fullIterations *=i;
+    }
+
+    std::cout<<"iteracji: "<<fullIterations<<std::endl;
 
     while (!queue.empty()) {
 
+        iterations ++;
+
+        //if(iterations % 1000 == 0)
+        //    std::cout<<"\r"<<iterations *100000/ fullIterations * 0.001<<" %, iteracja: "<<iterations;
 
         //kolejka FILO
         Destination d = queue[queue.size()-1];
@@ -187,6 +214,7 @@ std::vector<unsigned int> Algorythms::BAndBTSPIter(int beginVert, const Neighbou
 
     distance = minDistance;
     minPath.push_back(beginVert);
+    std::cout<<std::endl;
     return minPath;
 
 }
