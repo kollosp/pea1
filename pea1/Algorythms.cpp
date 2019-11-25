@@ -39,10 +39,11 @@ std::vector<unsigned int> Algorythms::bruteforceTSPIter(int beginVert, const Nei
 
     while (!queue.empty()) {
 
-        iterations ++;
+        //std::cout<<"iter: "<<iterations<<" size: "<<queue.size()<<std::endl;
+        //iterations ++;
 
-        if(iterations % 1000 == 0)
-            std::cout<<"\r"<<iterations *100000/ fullIterations * 0.001<<" %, iteracja: "<<iterations;
+        //if(iterations % 1000 == 0)
+            //std::cout<<"\r"<<iterations *100000/ fullIterations * 0.001<<" %, iteracja: "<<iterations;
 
         //kolejka FILO
         Destination d = queue[queue.size()-1];
@@ -497,9 +498,9 @@ int Algorythms::dynamicTSPDistanceF(int beginVert, unsigned int s, unsigned int 
             j<<=1;
         }
 
-//        std::bitset<8> x(d.s);
-//        std::bitset<8> y(d.dst);
-//        std::cout<<"s: "<<d.s<<"("<<x<<") "<<d.dst<<"("<<y<<") d: "<<d.depth<<std::endl;
+        //std::bitset<8> x(d.s);
+        //std::bitset<8> y(d.dst);
+        //std::cout<<"s: "<<d.s<<"("<<x<<") "<<d.dst<<"("<<y<<") d: "<<d.depth<<std::endl;
 
     }
 
@@ -534,10 +535,13 @@ int Algorythms::dynamicTSPDistanceF(int beginVert, unsigned int s, unsigned int 
         while(j <= newS){
             //
             if((newS & j) > 0){
+
                 buf = array[newS + j*arraySize];
 
-                //std::cout<<newS<<" "<<j*arraySize<<" "<<buf<<std::endl;
-                if(min > buf){
+                int distanceTo = m.edge(log2(j)-1, log2(d.dst)-1);
+                buf += distanceTo;
+
+                if(min> buf){
                     min = buf;
                     previous = j;
                 }
@@ -545,9 +549,15 @@ int Algorythms::dynamicTSPDistanceF(int beginVert, unsigned int s, unsigned int 
             j<<=1;
         }
 
-        array[d.s + d.dst*arraySize] = min + m.edge(log2(previous)-1, log2(d.dst)-1);
+        array[d.s + d.dst*arraySize] = min; // + m.edge(log2(previous)-1, log2(d.dst)-1);
         paths[d.s + d.dst*arraySize] = previous;
-   }
+
+
+        std::bitset<8> x(d.s);
+        std::bitset<8> y(d.dst);
+        std::cout<<"s: "<<d.s<<"("<<x<<") "<<d.dst<<"("<<y<<") d: "<<d.depth<<", v: "<<array[d.s + d.dst*arraySize]<<std::endl;
+
+    }
 
     return array[s + dst * arraySize];
 }
@@ -570,7 +580,7 @@ std::vector<int> Algorythms::refactorDynamicTSPPath(int start, int dst, unsigned
 
         std::bitset<8> x(lastS);
         std::bitset<8> y(lastDst);
-        std::cout<<"s: "<<lastS<<"("<<x<<") "<<lastDst<<"("<<y<<") "<<path[path.size()-1]<<std::endl;
+        //std::cout<<"s: "<<lastS<<"("<<x<<") "<<lastDst<<"("<<y<<") "<<path[path.size()-1]<<std::endl;
 
     }
 
