@@ -24,6 +24,9 @@ class Menu
                            " 7. TSP Metoda B&B wglab\n"
                            " 8. TSP Metoda zachlanna\n"
                            " 9. TSP Metoda prog. dynamicznego\n"
+                           " 10. TSP Tabu search\n"
+                           " 11. TSP Symulowane wyzarzanie\n"
+                           " 20. Policz dlugosc sciezki\n"
                            " 0. Wyjscie z programu";
 
 
@@ -43,6 +46,7 @@ public:
     void displayMatrix();
     void displayList();
 
+    void run(int argc, char*argv[]);
     void run();
 
     void pause();
@@ -51,15 +55,14 @@ public:
     void bruteforceLimited();
     void greedy();
     void dynamic();
+    void tabuSearch();
+    void simAnnealing();
+
+    void simAnnealingTest();
+    void tabuSearchTest();
+    void countPath();
 };
 
-template <typename T>
-std::ostream& operator <<(std::ostream&str, std::vector<T> obj){
-    for(unsigned int i=0;i<obj.size();++i){
-        str<<obj[i]<<" ";
-    }
 
-    return str;
-}
 
 #endif // MENU_H

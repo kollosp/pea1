@@ -69,7 +69,8 @@ public:
     std::vector<int> edges() const;
 
     /**
-     * @brief sumMinimumEdgesOfVerts
+     * @brief sumMinimumEdgesOfVerts - funkcja dla kazdego wierzcholka sprawdza najkrotsza sciezke
+        wychodzaca z niego i sumuje znalezione minima
      * @param verts
      * @return
      */
@@ -77,6 +78,16 @@ public:
 
     std::vector<int> complement(const std::vector<unsigned int> &verts) const;
     std::vector<int> complement(const std::vector<int> &verts) const;
+
+    /**
+     * @brief calcPathDistance funkcja sumuje koszt przescia trasy okreslonej w verts.
+     * Jezeli endVert istnieje to do wyniku zostanie dodana odleglosc od verts[verts.size()-1] do
+     * endVert
+     * @param verts
+     * @param endVert
+     * @return
+     */
+    int calcPathDistance(const std::vector<int> &verts, int endVert =-1) const;
 
 };
 

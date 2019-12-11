@@ -1,6 +1,8 @@
 #include "Algorythms.h"
 #include <bitset>
 
+#include <algorithm>
+
 Algorythms::Algorythms()
 {
 
@@ -363,6 +365,185 @@ std::vector<int> Algorythms::dynamicTSP(int beginVert, const NeighbourMatrix &m,
 
     return p;
 }
+
+std::vector<int> Algorythms::tabuSearchTSP(int beginVert, const NeighbourMatrix &m, int &distance, int iterations, int tabuLength, int criticalLimit)
+{
+    int criticalEvents = 0;
+    std::vector<std::vector<char>> tabu;
+
+    for(int i=0;i<m.size();++i){
+        tabu.push_back(std::vector<char>(m.size(), 0));
+    }
+
+
+    distance = INT32_MAX;
+
+    std::vector<int> minPath;
+    std::vector<int> returnPath;
+
+    //najlepsza sciezka w jednej iteracji
+    std::vector<int> bestCurrentPath(minPath.size(),0);
+
+    //sprawdzana sciezka
+    std::vector<int> path;
+
+    //minPath.push_back(0);
+    for(int i=0; i<m.size();++i){
+        if(i != beginVert){
+            minPath.push_back(i);
+        }
+    }
+
+    std::random_shuffle(minPath.begin(), minPath.end());
+    minPath.insert(minPath.begin(), beginVert);
+
+    distance = m.calcPathDistance(minPath, beginVert);
+
+    for(int i=0;i<iterations;++i){
+
+        bestCurrentPath = minPath;
+        int bestCurrentDistance = distance;
+        path = minPath;
+
+        int bestJ, bestK;
+        for(int j=1;j<minPath.size();++j){
+            ++i;
+            for(int k=1;k<minPath.size();++k){
+
+
+
+                //jezeli ruch nie jest zakazany to zamien
+                if(tabu[j][k] == 0){
+                    int buf = minPath[j];
+                    minPath[j] = minPath[k];
+                    minPath[k] = buf;
+
+                    int d = m.calcPathDistance(minPath, beginVert);
+
+                    if(d < bestCurrentDistance){
+                        bestCurrentDistance = d;
+                        bestCurrentPath = minPath;
+                        bestJ = j;
+                        bestK = k;
+                    }
+
+
+                    buf = minPath[j];
+                    minPath[j] = minPath[k];
+                    minPath[k] = buf;
+                }else{
+                    tabu[j][k]--;
+                }
+            }
+        }
+
+        tabu[bestJ][bestK] = tabuLength;
+
+        if(bestCurrentDistance < distance){
+            distance = bestCurrentDistance;
+            minPath = bestCurrentPath;
+            returnPath = bestCurrentPath;
+        }else{
+            if(criticalLimit <= criticalEvents){
+                //przeladuj liste tabu
+                for(unsigned int j=1;j<minPath.size();++j){
+                    for(unsigned int k=1;k<minPath.size();++k){
+                        tabu[j][k] = 0;
+                    }
+                }
+
+                minPath.erase(minPath.begin());
+                std::random_shuffle(minPath.begin(), minPath.end());
+                minPath.insert(minPath.begin(), beginVert);
+                //std::cout<<"blad krytyczny"<<std::endl;
+                //std::cout<<minPath<<std::endl;
+                criticalEvents = 0;
+            }
+            else criticalEvents++;
+        }
+    }
+
+    //uwzglednij powrot
+    //distance = m.calcPathDistance(minPath, beginVert);
+    returnPath.push_back(beginVert);
+    distance+=m.edge(returnPath[returnPath.size()-1], beginVert);
+
+    /*int s = 0;
+    for(int i=0;i<returnPath.size()-1;++i){
+        std::cout<<m.edge(returnPath[i], returnPath[i+1])<<" + ";
+        s+=m.edge(returnPath[i], returnPath[i+1]);
+    }
+
+    std::cout<<" = "<<distance<<" ("<<s<<")\n";*/
+
+    return returnPath;
+}
+
+std::vector<int> Algorythms::simAnnealing(int beginVert, const NeighbourMatrix &m, int &distance, double TMax, double tempFactor, int iterations)
+{
+    int criticlaLimit=100, criticalEvents=criticlaLimit;
+
+    std::vector<int> minPath;
+    std::vector<int> retPath(m.size());
+    int retDistance = 0x0fffffff;
+
+    double t = TMax;
+
+    for(int i=0; i<m.size();++i){
+        if(i != beginVert){
+            minPath.push_back(i);
+        }
+    }
+
+    std::random_shuffle(minPath.begin(), minPath.end());
+    minPath.insert(minPath.begin(), beginVert);
+
+    distance = m.calcPathDistance(minPath, beginVert);
+
+    while(iterations > 0){
+
+        int x = (rand()%(m.size()-1)) + 1;
+        int y = (rand()%(m.size()-1)) + 1;
+
+        std::vector<int> p = minPath;
+        std::swap(p[x], p[y]);
+
+        int d=m.calcPathDistance(p, beginVert);
+        int delta = d - distance;
+
+        if(delta < 0){
+            minPath = p;
+            distance = d;
+            criticalEvents=criticlaLimit;
+        }else{
+            double r = (rand()%100000)/100000.0;
+            double e = exp((double)-delta/t);
+            //std::cout<<"d: "<<d<<" delta: "<<delta<<" r: "<<r<<" t: "<<t<<" e: "<<e<<std::endl;
+            if(r < e){
+                //std::cout<<"done"<<std::endl;
+                minPath = p;
+                distance = d;
+                criticalEvents=criticlaLimit;
+            }else{
+                criticalEvents--;
+            }
+        }
+
+        if(distance < retDistance) {
+            retPath = minPath;
+            retDistance = distance;
+        }
+
+        t = tempFactor * t;
+        iterations--;
+    }
+
+    distance = m.calcPathDistance(retPath, beginVert);
+    retPath.push_back(beginVert);
+    return retPath;
+
+}
+
 
 
 Algorythms::BruteforceData Algorythms::bruteforceRecursive(int current, std::vector<int> path, int distance, const NeighbourMatrix &m, std::vector<int>&currentMinPath, int& currentMinDistance)

@@ -21,6 +21,18 @@ int main(int argc, char* argv[])
     if(argc >= 2){
         m.initFromFile(argv[1]);
         //m.dynamic();
+
+        if(argc >= 3){
+            std::string str(argv[2]);
+            if(str == "tabu"){
+                m.tabuSearchTest();
+            }
+            else if(str == "sim"){
+                m.simAnnealingTest();
+            }
+
+            return 0;
+        }
     }
 
     m.run();

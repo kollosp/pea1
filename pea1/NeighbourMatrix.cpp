@@ -181,6 +181,21 @@ std::vector<int> NeighbourMatrix::complement(const std::vector<int> &verts) cons
     return ret;
 }
 
+int NeighbourMatrix::calcPathDistance(const std::vector<int> &verts, int endVert) const
+{
+    int distance = 0;
+    for(int i=1;i<verts.size();++i){
+        distance += edge(verts[i-1], verts[i]);
+    }
+
+    //jezel endVert istnieje wtedy dodaj powrot
+    if(endVert >= 0){
+        distance+=edge(verts[verts.size()-1], endVert);
+    }
+
+    return distance;
+}
+
 std::ostream &operator <<(std::ostream &str, const NeighbourMatrix &matrix)
 {
     str<<std::setw(4)<<"\\";

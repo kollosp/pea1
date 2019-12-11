@@ -139,6 +139,18 @@ public:
     static std::vector<int> bruteforceTSPLimited(int beginVert, const NeighbourMatrix &m, int &distance);
     static std::vector<int> greedyTSP(int beginVert, const NeighbourMatrix &m, int &distance);
     static std::vector<int> dynamicTSP(int beginVert, const NeighbourMatrix &m, int &distance);
+    static std::vector<int> tabuSearchTSP(int beginVert, const NeighbourMatrix &m, int &distance, int iterations=100000, int tabuLength=20, int criticalLimit=20);
+    static std::vector<int> simAnnealing(int beginVert, const NeighbourMatrix &m, int &distance, double TMax, double tempFactor, int iterations);
+
 };
+
+template <typename T>
+std::ostream& operator <<(std::ostream&str, std::vector<T> obj){
+    for(unsigned int i=0;i<obj.size();++i){
+        str<<obj[i]<<" ";
+    }
+
+    return str;
+}
 
 #endif // ALGORYTHMS_H
