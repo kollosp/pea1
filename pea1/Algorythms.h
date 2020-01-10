@@ -43,7 +43,23 @@ class Algorythms
 
     static void genericEdgeCrossover(std::vector<std::vector<int> > &generation, std::vector<int> &costs);
     static void genericPMXCrossover(std::vector<std::vector<int> > &generation, std::vector<int> &costs);
+
+    /**
+     * Funkcja zamienia dwa miasta ze soba
+     * @brief genericReplaceMutation
+     * @param generation
+     * @param probability
+     */
     static void genericReplaceMutation(std::vector<std::vector<int> > &generation, float probability);
+
+
+    /**
+     * Funkcja wydziela fragment genu <x1,x2> nastepnie skleja ciagi <0,x1) i (x2, n> i po n doklada <x1,x2>.
+     * @brief genericReplaceStringMutation
+     * @param generation
+     * @param probability
+     */
+    static void genericReplaceStringMutation(std::vector<std::vector<int> > &generation, float probability);
 
 public:
     static int log2(unsigned int a);

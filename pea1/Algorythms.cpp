@@ -607,7 +607,8 @@ std::vector<int> Algorythms::generic(int beginVert, const NeighbourMatrix &m, in
         Algorythms::genericPMXCrossover(generation, costs);
 
         //rozne algorytmy mutacji
-        Algorythms::genericReplaceMutation(generation, mutationProb);
+        //Algorythms::genericReplaceMutation(generation, mutationProb);
+        Algorythms::genericReplaceStringMutation(generation, mutationProb);
 
         std::cout<<std::endl;
         for(int j=0;j<generation.size();++j){
@@ -1052,6 +1053,40 @@ void Algorythms::genericReplaceMutation(std::vector<std::vector<int> > &generati
             int x2 = (rand() % (generation[i].size()-1)) + 1;
 
             std::swap(generation[i][x1],generation[i][x2]);
+        }
+    }
+}
+
+void Algorythms::genericReplaceStringMutation(std::vector<std::vector<int> > &generation, float probability)
+{
+    for(int i=0;i<generation.size();++i){
+        float p = (rand()%10000)/10000.0;
+
+        if(p > probability){
+            int x1 = (rand() % (generation[i].size()-1)) +1;
+            int x2 = (rand() % (generation[i].size()-1)) + 1;
+
+            if(x1>x2) std::swap(x1,x2);
+
+            std::vector<int> temp(generation[i]);
+
+            int index = x1;
+
+            //fragment 0..x1 pozostaje bez zmian
+
+            for(int j=x2;j<temp.size();++j){
+                generation[i][index] = temp[j];
+                index++;
+            }
+
+            for(int j=x1;j<x2;++j){
+                generation[i][index] = temp[j];
+                index++;
+            }
+
+            //std::cout<<"----"<<std::endl;
+            //std::cout<<temp<<" | "<<x1<<" "<<x2<<std::endl;
+            //std::cout<<generation[i]<<std::endl;
         }
     }
 }
