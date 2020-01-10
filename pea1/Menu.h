@@ -26,6 +26,7 @@ class Menu
                            " 9. TSP Metoda prog. dynamicznego\n"
                            " 10. TSP Tabu search\n"
                            " 11. TSP Symulowane wyzarzanie\n"
+                           " 12. TSP Genetyczny\n"
                            " 20. Policz dlugosc sciezki\n"
                            " 0. Wyjscie z programu";
 
@@ -61,6 +62,8 @@ public:
     void simAnnealingTest();
     void tabuSearchTest();
     void countPath();
+
+    void generic();
 };
 
 

@@ -1,6 +1,6 @@
 #include "Algorythms.h"
 #include <bitset>
-
+#include <cmath>
 #include <algorithm>
 
 Algorythms::Algorythms()
@@ -544,6 +544,84 @@ std::vector<int> Algorythms::simAnnealing(int beginVert, const NeighbourMatrix &
 
 }
 
+std::vector<int> Algorythms::generic(int beginVert, const NeighbourMatrix &m, int &distance, int seconds, int populationSize, float mutationProb)
+{
+    //generate first generation
+
+    //while time < seconds
+        //select best
+        //reproduce new generation
+        //mutate
+
+    distance = 0x0ffffff;
+    std::vector<int> minPath;
+    std::vector<std::vector<int> > generation(populationSize);
+
+    for(int i=0;i<generation.size();++i){
+        std::vector<int> unit(m.size());
+
+        unit[0] = beginVert;
+        for(int j=1;j<m.size();++j){
+            if(j != beginVert)
+                unit[j] = j;
+            else unit[j] = 0;
+        }
+
+        std::random_shuffle(unit.begin()+1, unit.end());
+        std::cout<<unit<<std::endl;
+        generation[i] = unit;
+    }
+
+
+    std::vector<int> costs(populationSize);
+    Timer tm;
+    tm.start();
+
+    while (tm.elapsed() < seconds) {
+        std::cout<<tm.elapsed()<<" "<<seconds<<std::endl;
+        //caculate costs
+        for(unsigned int i=0;i<generation.size();++i){
+            costs[i] = m.calcPathDistance(generation[i],beginVert);
+        }
+
+        //order generation by cost
+        for(int i=0;i<generation.size()-1;++i){
+            for(int j=0;j<generation.size()-i-1;++j){
+                if(costs[j]>costs[j+1]){
+                    std::swap(costs[j], costs[j+1]);
+                    std::swap(generation[j], generation[j+1]);
+                }
+            }
+        }
+
+
+        if(distance > costs[0]){
+            distance = costs[0];
+            minPath = generation[0];
+        }
+
+        //reproduce
+
+        //rozne algorytmy reprodukcji
+        //Algorythms::genericEdgeCrossover(generation, costs);
+        Algorythms::genericPMXCrossover(generation, costs);
+
+        //rozne algorytmy mutacji
+        Algorythms::genericReplaceMutation(generation, mutationProb);
+
+        std::cout<<std::endl;
+        for(int j=0;j<generation.size();++j){
+            std::cout<<generation[j]<<std::endl;
+
+        }
+
+        tm.stop();
+    }
+
+    minPath.push_back(beginVert);
+    return minPath;
+}
+
 
 
 Algorythms::BruteforceData Algorythms::bruteforceRecursive(int current, std::vector<int> path, int distance, const NeighbourMatrix &m, std::vector<int>&currentMinPath, int& currentMinDistance)
@@ -775,6 +853,209 @@ std::vector<int> Algorythms::refactorDynamicTSPPath(int start, int dst, unsigned
     return ret;
 }
 
+void Algorythms::genericEdgeCrossover(std::vector<std::vector<int> > &generation, std::vector<int> &costs)
+{
+    std::vector<std::vector<int> > newGeneration(generation.size());
+
+    //calculate generation avg
+    /*
+    int avg = 0;
+    for(int c:costs)
+        avg+=c;
+    avg/=costs.size();
+    */
+
+    //parents are 1 and 2
+    int p1 = 0;
+    int p2 = 1;
+    std::vector<std::vector<int> > connections(generation[0].size());
+
+    for(int j=1;j<connections.size();++j){
+        std::vector<int> neighbours;
+
+        //dodaj numer wierzcholka aby mozna bylo usuwac connections[i] podczas przetwarzania
+        neighbours.push_back(j);
+
+        //wygeneruj listy sasiadow dla wszystkich wierzcholkow. Sasiadow wez z dwoch najlepszych
+        //(indeksy 0 i 1)
+        for(int k=1;k<generation[p1].size();++k){
+            if(j == generation[p1][k]){
+                neighbours.push_back(generation[p1][(k+1)%connections.size()]);
+                int index = k-1;
+                if(index < 1) index = connections.size()-1;
+                neighbours.push_back(generation[p1][index]);
+            }
+        }
+
+        for(int k=1;k<generation[p2].size();++k){
+            if(j == generation[p2][k]){
+                int v = generation[p2][(k+1)%connections.size()];
+                if(v != neighbours[0] && v != neighbours[1])
+                    neighbours.push_back(v);
+                int index = k-1;
+                if(index < 1) index = connections.size()-1;
+                v = generation[p2][index];
+                if(v != neighbours[0] && v != neighbours[1])
+                    neighbours.push_back(v);
+            }
+        }
+
+        connections[j] = neighbours;
+    }
+
+    //std::cout<<std::endl;
+
+    for(int i=0;i<generation.size();++i){
+
+        std::vector<std::vector<int> > c(connections);
+        std::vector<int> child(c.size());
+        /*for(int j=0;j<connections.size();++j){
+            std::cout<<connections[j]<<std::endl;
+        }*/
+
+        //rozpocznij tworzenie nowego potomka
+
+        //wylosuj startowy wierzcholek
+        int randIndex = (rand()%(c.size()-1)) + 1;
+
+        int v = c[randIndex][0];
+
+        for(int z=1;z<child.size();++z){
+
+            child[z] = v;
+
+            //usun uzyty wierzcholek
+            for(int j=1;j<c.size();++j){
+                if(c[j][0] == v)
+                   c.erase(c.begin()+j);
+            }
+
+            //usun v z list sasiadow
+            for(int j=1;j<c.size();++j){
+                for(int k=0;k<c[j].size();++k)
+                    if(c[j][k] == v)
+                        c[j].erase(c[j].begin()+k);
+            }
+
+            //wybierz nowe v
+            int indexOfmin = 1;
+            int min = c[1].size();
+            for(int j=1;j<c.size();++j){
+                if(min > c[j].size()){
+                    indexOfmin = j;
+                    min = c[j].size();
+                }
+            }
+
+            v = c[indexOfmin][0];
+            //std::cout<<c.size()<<std::endl;
+        }
+        //std::cout<<child<<std::endl;
+        newGeneration[i] = child;
+    }
+
+    generation = newGeneration;
+}
+
+void Algorythms::genericPMXCrossover(std::vector<std::vector<int> > &generation, std::vector<int> &costs)
+{
+    std::vector<int> p1(generation[0]);
+    std::vector<int> p2(generation[1]);
+
+    for(int i=0;i<generation.size();){
+        int i1 = rand()%(generation[i].size()-1) +1;
+        int i2 = rand()%(generation[i].size()-1) +1;
+
+        if(i1>i2) std::swap(i1,i2);
+
+        std::vector<int> r(p1);
+        std::vector<int> q(p2);
+
+
+        //std::cout<<"1."<<r<<" "<<q<<"|"<<i1<<" "<<i2<<std::endl;
+
+        //zamien sekcje dopasowania
+        for(int j=i1;j<i2;++j){
+            std::swap(r[j], q[j]);
+        }
+
+        //std::cout<<"2."<<r<<" "<<q<<"|"<<i1<<" "<<i2<<std::endl;
+
+        for(int k=1;k<p1.size();++k){
+            if(k == i1) k=i2;
+            for(int j=i1;j<i2;++j){
+                if(r[k] == r[j]){
+
+                    //znajdz brakujacy znak
+                    for(int z=0;z<p1.size();++z){
+                        bool ok=true;
+                        for(int y=0;y<p1.size();++y){
+                            if(q[z] == r[y]){
+                                ok = false;
+                                break;
+                            }
+                        }
+
+                        if(ok){
+                            r[k] = q[z];
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        for(int k=1;k<p1.size();++k){
+            if(k == i1) k=i2;
+            for(int j=i1;j<i2;++j){
+                if(q[k] == q[j]){
+
+                    //znajdz brakujacy znak
+                    for(int z=0;z<p1.size();++z){
+                        bool ok=true;
+                        for(int y=0;y<p1.size();++y){
+                            if(r[z] == q[y]){
+                                ok = false;
+                                break;
+                            }
+                        }
+
+                        if(ok){
+                            q[k] = r[z];
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        //std::cout<<"3."<<r<<" "<<q<<"|"<<i1<<" "<<i2<<std::endl;
+
+
+        generation[i] = r;
+        ++i;
+
+        if(i<generation.size()){
+            generation[i] = q;
+            ++i;
+        }
+    }
+}
+
+void Algorythms::genericReplaceMutation(std::vector<std::vector<int> > &generation, float probability)
+{
+    for(int i=0;i<generation.size();++i){
+        float p = (rand()%10000)/10000.0;
+
+        if(p > probability){
+            int x1 = (rand() % (generation[i].size()-1)) +1;
+            int x2 = (rand() % (generation[i].size()-1)) + 1;
+
+            std::swap(generation[i][x1],generation[i][x2]);
+        }
+    }
+}
+
 int Algorythms::log2(unsigned int a)
 {
     int i=0;
@@ -803,69 +1084,3 @@ int Algorythms::countOnes(unsigned int a)
     return count;
 
 }
-
-/*
-int Algorythms::dynamicTSPDistanceF(int beginVert, unsigned int s, unsigned int dst, const NeighbourMatrix &m,
-                                    unsigned int *array, unsigned int *paths, int arraySize, std::string string)
-{
-    int d = 0;
-    int vert = 0;
-
-    //jezeli s zawiera tylko jedna jedynke (jest potega dwojki) to znaczy ze
-    //podana poszukiwana jest droga dlugosci 1
-    if(s != 0 && (s & (s-1)) == 0 && s == dst) {
-        d = m.edge(beginVert, log2(dst)-1);
-        vert = -1;
-    }
-    else{
-
-        //7(111) 2(10)
-        int newS = s;
-        int tDst = ~dst;
-        //usun dst z aktualnego wektora miast przez ktore trzeba przejsc
-        newS = newS & tDst; //usun bit miasta przeznaczenia z wektora miast do odwiedzenia
-
-        //5(101)
-
-
-        d = 0x0fffffff;
-        int j=1;
-
-        if(array[s + dst*arraySize] > 0){
-            //return array[s + dst*arraySize];
-        }
-
-
-        for(unsigned int i=0;i<sizeof(s)*8;++i){
-
-            //jezeli i-te miasto nalezy do wektora miast do odwiedzenia
-            if((j & newS) > 0){
-
-                //jezeli dana tablica zostala juz kiedys policzona
-                int distance = dynamicTSPDistanceF(beginVert, newS, j, m, array, paths, arraySize, string + " ") +
-                        m.edge(log2(j)-1,log2(dst)-1);
-
-                if(d > distance){
-                    d = distance;
-                    vert = j;
-                }
-            }
-
-            //aktualnie przetwarzany wierzcholek. j zawsze zawiera jedna jedynke
-            j<<=1;
-        }
-    }
-
-    std::bitset<8> x(s);
-    std::bitset<8> y(dst);
-    if(string.length() <= 2)
-    std::cout<<string + "s: "<<s<<"("<<x<<") "<<dst<<"("<<y<<") d: "<<d<<" vert: "<<vert<<std::endl;
-
-    array[s + dst*arraySize] = d;
-
-    //zeby dosc do dst przechodzac przez wszystkie wierzcholki w s nalezy przejsc przez
-    //vert (vert zawiera o jedna jedynke mniej niz s)
-    paths[s + dst*arraySize] = vert;
-
-    return d;
-}*/

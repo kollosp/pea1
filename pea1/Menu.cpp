@@ -127,6 +127,7 @@ void Menu::run()
             case 9: dynamic();             break;
             case 10: tabuSearch();             break;
             case 11: simAnnealing();             break;
+            case 12: generic();             break;
             case 20: countPath();             break;
             default: continue;
         }
@@ -285,5 +286,17 @@ void Menu::countPath()
     }
 
     std::cout<<"Dlugosc: "<<graphMatrix.calcPathDistance(verts, verts[0])<<std::endl;
+}
+
+void Menu::generic()
+{
+    try{
+        int distance = 0;
+        std::cout<<"Rezultat algorytmu generycznego: "<<Algorythms::generic(0,graphMatrix, distance, 20, 10, 0.5);
+        std::cout<<" dystans: "<<distance<<std::endl;
+
+    }catch(const char* e){
+        std::cerr<<e<<std::endl;
+    }
 }
 

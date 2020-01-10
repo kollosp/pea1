@@ -2,6 +2,7 @@
 #define ALGORYTHMS_H
 
 #include "NeighbourMatrix.h"
+#include "Timer.h"
 
 //TSP15 B&B  61.5751  [0 12 1 14 8 4 6 2 11 13 9 7 5 3 10 0]
 
@@ -39,6 +40,10 @@ class Algorythms
     static int dynamicTSPDistanceF(int beginVert, unsigned int s, unsigned int dst,
                                    const NeighbourMatrix &m, unsigned int *array, unsigned int *paths, int arraySize, std::string string="");
     static std::vector<int> refactorDynamicTSPPath(int start, int dst, unsigned int *paths, int arraySize);
+
+    static void genericEdgeCrossover(std::vector<std::vector<int> > &generation, std::vector<int> &costs);
+    static void genericPMXCrossover(std::vector<std::vector<int> > &generation, std::vector<int> &costs);
+    static void genericReplaceMutation(std::vector<std::vector<int> > &generation, float probability);
 
 public:
     static int log2(unsigned int a);
@@ -142,6 +147,8 @@ public:
     static std::vector<int> tabuSearchTSP(int beginVert, const NeighbourMatrix &m, int &distance, int iterations=100000, int tabuLength=20, int criticalLimit=20);
     static std::vector<int> simAnnealing(int beginVert, const NeighbourMatrix &m, int &distance, double TMax, double tempFactor, int iterations);
 
+
+    static std::vector<int> generic(int beginVert, const NeighbourMatrix &m, int &distance, int seconds, int generationCount, float mutationProb);
 };
 
 template <typename T>
