@@ -164,7 +164,7 @@ public:
     static std::vector<int> simAnnealing(int beginVert, const NeighbourMatrix &m, int &distance, double TMax, double tempFactor, int iterations);
 
 
-    static std::vector<int> generic(int beginVert, const NeighbourMatrix &m, int &distance, int seconds, int generationCount, float mutationProb);
+    static std::vector<int> generic(int beginVert, const NeighbourMatrix &m, int &distance, int seconds, int generationCount, float mutationProb, int &generationCounter);
 };
 
 template <typename T>

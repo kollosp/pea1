@@ -178,7 +178,7 @@ void Menu::tabuSearch()
 {
     try{
         int distance = 0;
-        std::cout<<"Rezultat tabu search TSP: "<<Algorythms::tabuSearchTSP(0,graphMatrix, distance, 500000, 30);
+        std::cout<<"Rezultat tabu search TSP: "<<Algorythms::tabuSearchTSP(0,graphMatrix, distance, 40, 30);
         std::cout<<" dystans: "<<distance<<std::endl;
 
     }catch(const char* e){
@@ -247,29 +247,93 @@ void Menu::simAnnealingTest()
 
 void Menu::tabuSearchTest()
 {
-    std::vector<int> iterations = {500000}; //czas iterowania
-    std::vector<float> tabuSize = {3.68,7.35,14.71,29.41,36.76,44.12,58.82,73.53,88.24}; //dlugosc listy w %
+    std::vector<int> iterations = {5,10,20,30,40}; //czas iterowania
+    std::vector<float> tabuSize = {1}; //dlugosc listy w %
     std::vector<int> criticals = {20}; //ilosc bledow do resetu
+
+    double opt = 1273;
 
     for(int it : iterations){
         for(int ts:tabuSize){
             for(int c : criticals){
 
-                std::cout<<"====================================="<<std::endl;
-                std::cout<<"iterations: "<<it<<" tabuSize: "<<ts<<" criticalEvents: "<<c<<std::endl;
-                int distance = 0;
 
-                for(int i=1;i<=20;++i){
+                int distanceSum = 0;
+                int distanceCount = 0;
+
+                std::cout<<"====================================="<<std::endl;
+                std::cout<<"seconds: "<<it<<" tabuSize: "<<ts<<" criticalEvents: "<<c<<std::endl;
+                int distance = 0;
+                double error = 0;
+
+                int counter = 0;
+
+                for(int i=1;i<=3;++i){
 
                     Timer tm;
                     tm.start();
-
                     Algorythms::tabuSearchTSP(0,graphMatrix, distance, it, (graphMatrix.size()-1) * graphMatrix.size()* ts /200.0, c);
 
-                    tm.stop();
-                    std::cout<<i<<"; "<<std::fixed<<tm.elapsed()*1000<<";"<<distance<<";"<<std::endl;
+                    double e = ((distance - opt) / distance) * 100;
+                    error += e;
 
+                    tm.stop();
+                    //std::cout<<i<<"; "<<std::fixed<<tm.elapsed()*1000<<";"<<distance<<";"<<std::endl;
+
+                    distanceSum += distance;
+                    distanceCount ++;
                 }
+
+                std::cout<<"AVG; "<<double(distanceSum/distanceCount)<<";"<<error/distanceCount<<""<<std::endl;
+            }
+        }
+    }
+}
+
+void Menu::genericTest()
+{
+    //std::vector<int> seconds = {5,10,20,30,40}; //czas iterowania
+    std::vector<int> seconds = {15}; //czas iterowania
+    std::vector<int> population= {20}; //czas iterowania
+    std::vector<float> mutation = {0.02, 0.05, 0.1, 0.2, 0.5}; //czas iterowania
+
+    double opt = 1273;
+
+    for(int s :seconds){
+        for(float m : mutation){
+            for(int p : population){
+
+                int distanceSum = 0;
+                int distanceCount = 0;
+
+                std::cout<<"====================================="<<std::endl;
+                std::cout<<"seconds;"<<"popSize;"<<"mutation;"<<std::endl;
+                std::cout<<s<<";"<<p<<";"<<m<<";"<<std::endl;
+                std::cout<<"no;"<<"time;"<<"distance;"<<"error;"<<"generationCount;"<<std::endl;
+
+                double error = 0;
+
+                int distance = 0;
+                int counter = 0;
+
+                for(int i=1;i<=1;++i){
+                    Timer tm;
+                    tm.start();
+
+                    Algorythms::generic(0,graphMatrix, distance, s, p, m, counter);
+                    tm.stop();
+
+
+                    double e = ((distance - opt) / distance) * 100;
+                    error += e;
+                    //std::cout<<i<<"; "<<std::fixed<<tm.elapsed()*1000<<";"<<distance<<";"<<e<<";"<<counter<<""<<std::endl;
+
+                    distanceSum += distance;
+                    distanceCount ++;
+                }
+
+
+                std::cout<<"AVG; "<<double(distanceSum/distanceCount)<<";"<<error/distanceCount<<""<<std::endl;
             }
         }
     }
@@ -292,8 +356,13 @@ void Menu::generic()
 {
     try{
         int distance = 0;
-        std::cout<<"Rezultat algorytmu generycznego: "<<Algorythms::generic(0,graphMatrix, distance, 20, 10, 0.5);
+        int generationCounter = 0;
+        int population = 20;
+        int seconds = 30;
+        std::cout<<"Rezultat algorytmu genetycznego: "<<Algorythms::generic(0,graphMatrix, distance, seconds, population, 0.1, generationCounter);
         std::cout<<" dystans: "<<distance<<std::endl;
+        std::cout<<" l. pokolen: "<<generationCounter<<std::endl;
+        std::cout<<" populacja: "<<population<<std::endl;
 
     }catch(const char* e){
         std::cerr<<e<<std::endl;

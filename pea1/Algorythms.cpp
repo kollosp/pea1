@@ -399,7 +399,11 @@ std::vector<int> Algorythms::tabuSearchTSP(int beginVert, const NeighbourMatrix 
 
     distance = m.calcPathDistance(minPath, beginVert);
 
-    for(int i=0;i<iterations;++i){
+    Timer tm;
+    tm.start();
+    tm.stop();
+
+    while (tm.elapsed() < iterations) {
 
         bestCurrentPath = minPath;
         int bestCurrentDistance = distance;
@@ -407,7 +411,6 @@ std::vector<int> Algorythms::tabuSearchTSP(int beginVert, const NeighbourMatrix 
 
         int bestJ, bestK;
         for(int j=1;j<minPath.size();++j){
-            ++i;
             for(int k=1;k<minPath.size();++k){
 
 
@@ -461,6 +464,9 @@ std::vector<int> Algorythms::tabuSearchTSP(int beginVert, const NeighbourMatrix 
             }
             else criticalEvents++;
         }
+
+
+        tm.stop();
     }
 
     //uwzglednij powrot
@@ -544,7 +550,7 @@ std::vector<int> Algorythms::simAnnealing(int beginVert, const NeighbourMatrix &
 
 }
 
-std::vector<int> Algorythms::generic(int beginVert, const NeighbourMatrix &m, int &distance, int seconds, int populationSize, float mutationProb)
+std::vector<int> Algorythms::generic(int beginVert, const NeighbourMatrix &m, int &distance, int seconds, int populationSize, float mutationProb, int& generationCounter)
 {
     //generate first generation
 
@@ -568,7 +574,7 @@ std::vector<int> Algorythms::generic(int beginVert, const NeighbourMatrix &m, in
         }
 
         std::random_shuffle(unit.begin()+1, unit.end());
-        std::cout<<unit<<std::endl;
+        //std::cout<<unit<<std::endl;
         generation[i] = unit;
     }
 
@@ -576,9 +582,10 @@ std::vector<int> Algorythms::generic(int beginVert, const NeighbourMatrix &m, in
     std::vector<int> costs(populationSize);
     Timer tm;
     tm.start();
+    generationCounter = 0;
 
     while (tm.elapsed() < seconds) {
-        std::cout<<tm.elapsed()<<" "<<seconds<<std::endl;
+        //std::cout<<tm.elapsed()<<" "<<seconds<<std::endl;
         //caculate costs
         for(unsigned int i=0;i<generation.size();++i){
             costs[i] = m.calcPathDistance(generation[i],beginVert);
@@ -604,18 +611,44 @@ std::vector<int> Algorythms::generic(int beginVert, const NeighbourMatrix &m, in
 
         //rozne algorytmy reprodukcji
         //Algorythms::genericEdgeCrossover(generation, costs);
+
+        //1
         Algorythms::genericPMXCrossover(generation, costs);
-
-        //rozne algorytmy mutacji
-        //Algorythms::genericReplaceMutation(generation, mutationProb);
         Algorythms::genericReplaceStringMutation(generation, mutationProb);
+        //*/
 
-        std::cout<<std::endl;
+
+        //2/*
+        /*Algorythms::genericEdgeCrossover(generation, costs);
+        Algorythms::genericReplaceStringMutation(generation, mutationProb);
+        //*/
+
+
+        //3
+        /*Algorythms::genericPMXCrossover(generation, costs);
+        Algorythms::genericReplaceMutation(generation, mutationProb);
+        //*/
+
+
+        //4
+        /*Algorythms::genericEdgeCrossover(generation, costs);
+        Algorythms::genericReplaceMutation(generation, mutationProb);
+
+        /*std::cout<<"Generation"<<std::endl;
         for(int j=0;j<generation.size();++j){
             std::cout<<generation[j]<<std::endl;
 
-        }
+        }*/
 
+        //rozne algorytmy mutacji
+        //Algorythms::genericReplaceMutation(generation, mutationProb);
+
+        /*std::cout<<std::endl;
+        for(int j=0;j<generation.size();++j){
+            std::cout<<generation[j]<<std::endl;
+
+        }*/
+        generationCounter ++;
         tm.stop();
     }
 
@@ -1049,8 +1082,8 @@ void Algorythms::genericReplaceMutation(std::vector<std::vector<int> > &generati
         float p = (rand()%10000)/10000.0;
 
         if(p > probability){
-            int x1 = (rand() % (generation[i].size()-1)) +1;
-            int x2 = (rand() % (generation[i].size()-1)) + 1;
+            int x1 = (rand() % (generation[i].size()-2)) +1;
+            int x2 = (rand() % (generation[i].size()-2)) + 1;
 
             std::swap(generation[i][x1],generation[i][x2]);
         }
@@ -1059,7 +1092,7 @@ void Algorythms::genericReplaceMutation(std::vector<std::vector<int> > &generati
 
 void Algorythms::genericReplaceStringMutation(std::vector<std::vector<int> > &generation, float probability)
 {
-    for(int i=0;i<generation.size();++i){
+   /* for(int i=0;i<generation.size();++i){
         float p = (rand()%10000)/10000.0;
 
         if(p > probability){
@@ -1088,7 +1121,24 @@ void Algorythms::genericReplaceStringMutation(std::vector<std::vector<int> > &ge
             //std::cout<<temp<<" | "<<x1<<" "<<x2<<std::endl;
             //std::cout<<generation[i]<<std::endl;
         }
+    }*/
+
+    for(int i=0;i<generation.size();++i){
+        float p = (rand()%10000)/10000.0;
+
+        if(p > probability){
+            int x1 = (rand() % (generation[i].size()-2)) +1;
+            int x2 = (rand() % (generation[i].size()-2)) + 1;
+
+            while(!(x2 != x1 && x2 != (x1+1) && x2 != (x1-1)))
+                x2 = (rand() % (generation[i].size()-2)) + 1;
+
+
+            std::swap(generation[i][x1],generation[i][x2]);
+            std::swap(generation[i][x1+1],generation[i][x2+1]);
+        }
     }
+
 }
 
 int Algorythms::log2(unsigned int a)

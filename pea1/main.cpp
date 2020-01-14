@@ -30,6 +30,9 @@ int main(int argc, char* argv[])
             else if(str == "sim"){
                 m.simAnnealingTest();
             }
+            else if(str == "generic"){
+                m.genericTest();
+            }
 
             return 0;
         }

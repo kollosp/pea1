@@ -58,12 +58,13 @@ public:
     void dynamic();
     void tabuSearch();
     void simAnnealing();
+    void generic();
 
     void simAnnealingTest();
     void tabuSearchTest();
+    void genericTest();
     void countPath();
 
-    void generic();
 };
 
 
